@@ -6,8 +6,8 @@
 // These values are PUBLIC (anon key) — safe to expose in browser
 // The Row Level Security (RLS) policies in Supabase protect the data
 // Replace these with YOUR values from: Supabase Dashboard → Settings → API
-const SUPABASE_URL = 'https://YOUR-PROJECT-ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY-HERE';
+const SUPABASE_URL = 'https://xqrskvbhvxwrsdzufgtn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxcnNrdmJodnh3cnNkenVmZ3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzQ4ODUsImV4cCI6MjA5NDQ1MDg4NX0.XdOh6j974LwIGpEaBNPoBrgQO77em56G8udHbRNXW4o';
 
 // Initialize Supabase client (loaded via CDN in HTML)
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
