@@ -1,0 +1,35 @@
+# ╔════════════════════════════════════════════════════════════╗
+# ║  CLOUDFLARE PAGES — Security & Caching Headers            ║
+# ║  Placed in /public so Cloudflare reads it automatically   ║
+# ╚════════════════════════════════════════════════════════════╝
+
+# ─── Default headers for ALL routes ───
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# ─── Admin panel: do NOT index in search engines ───
+/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store, no-cache, must-revalidate
+
+# ─── Static assets: cache aggressively ───
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+# ─── HTML files: short cache (so updates show up fast) ───
+/*.html
+  Cache-Control: public, max-age=300, must-revalidate

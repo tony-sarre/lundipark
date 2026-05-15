@@ -1,0 +1,8 @@
+# ╔════════════════════════════════════════════════════════════╗
+# ║  WRANGLER CONFIG — Cloudflare Pages                        ║
+# ║  Used by `wrangler pages` CLI for local dev & deploy      ║
+# ╚════════════════════════════════════════════════════════════╝
+
+name = "lundipark-photography"
+pages_build_output_dir = "./public"
+compatibility_date = "2024-09-01"

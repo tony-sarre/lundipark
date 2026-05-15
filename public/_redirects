@@ -1,0 +1,11 @@
+# ╔════════════════════════════════════════════════════════════╗
+# ║  CLOUDFLARE PAGES — URL Rewrites & Redirects              ║
+# ║  Format: source destination [status_code]                 ║
+# ╚════════════════════════════════════════════════════════════╝
+
+# Clean URL for admin panel
+/admin            /admin/index.html  200
+/admin/           /admin/index.html  200
+
+# Redirect old domain if needed (uncomment when you have a second domain)
+# https://lundiparkphotography.com/*  https://lundiparkphotography.ca/:splat  301!

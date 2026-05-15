@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Lundipark Photography</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:       #FBFCFA;
+    --bg-2:     #F2F4F0;
+    --pine:     #4A5D4A;
+    --pine-dk:  #3A4A3A;
+    --pine-lt:  #8FA08C;
+    --ink:      #1A1A1A;
+    --grey:     #6B6B6B;
+    --line:     #E2E5E0;
+    --red:      #B84444;
+    --green:    #4A8B4A;
+    --amber:    #C48942;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-weight: 300;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── LOGIN SCREEN ─── */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 20px;
+  }
+  .login-card {
+    background: white;
+    padding: 50px 40px;
+    border: 1px solid var(--line);
+    max-width: 420px; width: 100%;
+    text-align: center;
+  }
+  .login-card h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400; font-size: 36px;
+    color: var(--pine);
+    margin-bottom: 8px;
+  }
+  .login-card .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--grey);
+    margin-bottom: 36px;
+    font-size: 16px;
+  }
+  .login-card label {
+    display: block; text-align: left;
+    font-size: 11px; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--grey);
+    margin-bottom: 6px; margin-top: 18px;
+  }
+  .login-card input {
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: transparent;
+    outline: none;
+    transition: border-color .25s;
+  }
+  .login-card input:focus { border-bottom-color: var(--pine); }
+  .login-card button {
+    width: 100%;
+    margin-top: 28px;
+    padding: 14px;
+    background: var(--pine); color: white;
+    border: none; border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .25s;
+  }
+  .login-card button:hover { background: var(--pine-dk); }
+  .login-card button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .login-error {
+    margin-top: 18px;
+    color: var(--red);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  /* ─── ADMIN LAYOUT ─── */
+  .admin {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    background: var(--ink);
+    color: white;
+    padding: 32px 0;
+    display: flex; flex-direction: column;
+  }
+  .sidebar-brand {
+    padding: 0 28px 28px;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .sidebar-brand h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400; font-size: 22px;
+  }
+  .sidebar-brand p {
+    font-size: 11px; letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.4);
+    margin-top: 4px;
+  }
+  .sidebar-nav { padding: 24px 0; flex: 1; }
+  .sidebar-nav button {
+    width: 100%; padding: 14px 28px;
+    background: transparent; border: none;
+    text-align: left; cursor: pointer;
+    color: rgba(255,255,255,.7);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 12px;
+    transition: all .2s;
+  }
+  .sidebar-nav button:hover { background: rgba(255,255,255,.05); color: white; }
+  .sidebar-nav button.active {
+    background: var(--pine);
+    color: white;
+    border-left: 3px solid var(--pine-lt);
+    padding-left: 25px;
+  }
+  .sidebar-nav button .badge {
+    margin-left: auto;
+    background: var(--amber); color: white;
+    font-size: 10px; padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0;
+  }
+  .sidebar-user {
+    padding: 20px 28px;
+    border-top: 1px solid rgba(255,255,255,.1);
+    font-size: 12px;
+  }
+  .sidebar-user .name { color: white; margin-bottom: 4px; }
+  .sidebar-user .email { color: rgba(255,255,255,.4); margin-bottom: 12px; font-size: 11px; }
+  .sidebar-user button {
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.2);
+    color: rgba(255,255,255,.7);
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .25s;
+    border-radius: 4px;
+  }
+  .sidebar-user button:hover { background: rgba(255,255,255,.05); color: white; }
+
+  /* ─── MAIN AREA ─── */
+  .main {
+    padding: 40px 50px;
+    overflow-y: auto;
+    max-height: 100vh;
+  }
+  .main-header {
+    margin-bottom: 36px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .main-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400; font-size: 36px;
+    color: var(--ink);
+  }
+  .main-header .subtitle {
+    font-style: italic; color: var(--grey);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+  }
+
+  /* ─── STATS GRID (dashboard) ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .stat-card {
+    background: white;
+    padding: 24px;
+    border: 1px solid var(--line);
+  }
+  .stat-card .label {
+    font-size: 11px; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--grey);
+    margin-bottom: 12px;
+  }
+  .stat-card .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 400;
+    color: var(--pine);
+    line-height: 1;
+  }
+  .stat-card .trend {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--green);
+  }
+
+  /* ─── PANELS ─── */
+  .panel {
+    background: white;
+    border: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .panel-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400; font-size: 22px;
+  }
+  .panel-body { padding: 28px; }
+
+  /* ─── TESTIMONIAL CARDS ─── */
+  .test-list { display: flex; flex-direction: column; gap: 16px; }
+  .test-row {
+    border: 1px solid var(--line);
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 20px;
+    align-items: start;
+    background: var(--bg);
+  }
+  .test-row.pending { border-left: 3px solid var(--amber); }
+  .test-row.approved { border-left: 3px solid var(--green); }
+  .test-row.rejected { border-left: 3px solid var(--red); opacity: .6; }
+  .test-meta { min-width: 140px; }
+  .test-name {
+    font-weight: 500; font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .test-info {
+    font-size: 11px; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--grey);
+    margin-bottom: 8px;
+  }
+  .test-rating { color: var(--amber); font-size: 14px; letter-spacing: 2px; }
+  .test-content {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; font-style: italic;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .test-date {
+    margin-top: 10px;
+    font-size: 11px; color: var(--grey);
+  }
+  .test-actions { display: flex; flex-direction: column; gap: 6px; min-width: 110px; }
+  .test-actions button {
+    padding: 8px 14px;
+    border: 1px solid;
+    font-size: 10px; letter-spacing: .15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: white;
+    transition: all .2s;
+  }
+  .btn-approve { color: var(--green); border-color: var(--green); }
+  .btn-approve:hover { background: var(--green); color: white; }
+  .btn-reject { color: var(--red); border-color: var(--red); }
+  .btn-reject:hover { background: var(--red); color: white; }
+  .btn-feature { color: var(--pine); border-color: var(--pine); }
+  .btn-feature.active { background: var(--pine); color: white; }
+  .btn-feature:hover { background: var(--pine); color: white; }
+  .btn-delete { color: var(--grey); border-color: var(--line); }
+  .btn-delete:hover { background: var(--grey); color: white; }
+
+  /* ─── CONTENT EDITOR ─── */
+  .content-list { display: flex; flex-direction: column; gap: 20px; }
+  .content-row {
+    border: 1px solid var(--line);
+    padding: 20px;
+    background: var(--bg);
+  }
+  .content-row .key {
+    font-family: 'Inter', monospace;
+    font-size: 11px;
+    color: var(--pine);
+    letter-spacing: .1em;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .content-row .category {
+    display: inline-block;
+    background: var(--bg-2);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    color: var(--grey);
+    margin-left: 8px;
+  }
+  .content-row .langs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .content-row .lang-block label {
+    font-size: 10px; letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--grey);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .content-row .lang-block textarea,
+  .content-row .lang-block input {
+    width: 100%;
+    border: 1px solid var(--line);
+    padding: 10px 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: white;
+    outline: none;
+    transition: border-color .25s;
+    resize: vertical;
+    min-height: 38px;
+  }
+  .content-row .lang-block textarea:focus,
+  .content-row .lang-block input:focus { border-color: var(--pine); }
+  .content-row .save-btn {
+    margin-top: 14px;
+    padding: 8px 20px;
+    background: var(--pine);
+    color: white;
+    border: none;
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .content-row .save-btn.saved { background: var(--green); }
+
+  /* ─── FILTERS ─── */
+  .filter-bar {
+    display: flex; gap: 8px;
+    margin-bottom: 20px;
+  }
+  .filter-bar button {
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid var(--line);
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .25s;
+    color: var(--grey);
+  }
+  .filter-bar button.active {
+    background: var(--pine);
+    color: white;
+    border-color: var(--pine);
+  }
+
+  /* ─── EMPTY STATE ─── */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--grey);
+  }
+  .empty p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+  }
+
+  /* ─── HIDE/SHOW PANELS ─── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ─── NOTIFICATIONS ─── */
+  .toast {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    background: var(--ink); color: white;
+    padding: 14px 24px;
+    font-size: 13px;
+    letter-spacing: .1em;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all .3s;
+    border-left: 3px solid var(--pine);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { border-left-color: var(--green); }
+  .toast.error { border-left-color: var(--red); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .admin { grid-template-columns: 1fr; }
+    .sidebar { padding: 16px; flex-direction: row; align-items: center; overflow-x: auto; }
+    .sidebar-brand, .sidebar-user { display: none; }
+    .sidebar-nav { display: flex; padding: 0; }
+    .sidebar-nav button { white-space: nowrap; padding: 12px 18px; }
+    .main { padding: 24px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .test-row { grid-template-columns: 1fr; }
+    .content-row .langs { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN VIEW ─── -->
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <h1>Lundipark Admin</h1>
+    <p class="subtitle">Sign in to manage your site</p>
+    <form id="loginForm" onsubmit="event.preventDefault(); doLogin();">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="you@email.com" required>
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" required>
+      <button type="submit" id="loginBtn">Sign In</button>
+    </form>
+    <p id="loginError" class="login-error" style="display:none;"></p>
+  </div>
+</div>
+
+<!-- ─── ADMIN PANEL VIEW ─── -->
+<div id="adminView" class="admin" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>Lundipark</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="testimonials">Testimonials <span id="pendingBadge" class="badge" style="display:none;">0</span></button>
+      <button class="nav-btn" data-view="content">Site Content</button>
+      <button class="nav-btn" data-view="photos">Photos</button>
+      <button class="nav-btn" data-view="bookings">Bookings</button>
+    </nav>
+    <div class="sidebar-user">
+      <div class="name" id="adminName">—</div>
+      <div class="email" id="adminEmail">—</div>
+      <button onclick="doLogout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ─── DASHBOARD ─── -->
+    <div id="view-dashboard" class="view active">
+      <div class="main-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="subtitle">Overview of your site activity</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <p class="label">Pending Reviews</p>
+          <p class="value" id="statPending">—</p>
+        </div>
+        <div class="stat-card">
+          <p class="label">Approved Reviews</p>
+          <p class="value" id="statApproved">—</p>
+        </div>
+        <div class="stat-card">
+          <p class="label">Active Photos</p>
+          <p class="value" id="statPhotos">—</p>
+        </div>
+        <div class="stat-card">
+          <p class="label">Total Bookings</p>
+          <p class="value" id="statBookings">—</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Quick Actions</h2>
+        </div>
+        <div class="panel-body">
+          <p style="color:var(--grey); font-family:'Cormorant Garamond', serif; font-style:italic; font-size:16px;">
+            Use the sidebar to navigate between sections. New testimonials need your approval before appearing on the public site.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TESTIMONIALS ─── -->
+    <div id="view-testimonials" class="view">
+      <div class="main-header">
+        <div>
+          <h1>Testimonials</h1>
+          <p class="subtitle">Approve, reject, or feature client reviews</p>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="pending">Pending</button>
+        <button class="filter-btn" data-filter="approved">Approved</button>
+        <button class="filter-btn" data-filter="rejected">Rejected</button>
+      </div>
+
+      <div id="testimonialsList" class="test-list">
+        <div class="empty"><p>Loading testimonials...</p></div>
+      </div>
+    </div>
+
+    <!-- ─── CONTENT EDITOR ─── -->
+    <div id="view-content" class="view">
+      <div class="main-header">
+        <div>
+          <h1>Site Content</h1>
+          <p class="subtitle">Edit any text on the site (EN + FR)</p>
+        </div>
+      </div>
+
+      <div id="contentList" class="content-list">
+        <div class="empty"><p>Loading content...</p></div>
+      </div>
+    </div>
+
+    <!-- ─── PHOTOS ─── -->
+    <div id="view-photos" class="view">
+      <div class="main-header">
+        <div>
+          <h1>Photos</h1>
+          <p class="subtitle">Manage site images and gallery</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <p style="color:var(--grey); font-family:'Cormorant Garamond', serif; font-style:italic; font-size:16px;">
+            Photo management coming in Phase 3 — upload, replace and organize all site images from here.<br>
+            For now, photos are embedded in the site code.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── BOOKINGS ─── -->
+    <div id="view-bookings" class="view">
+      <div class="main-header">
+        <div>
+          <h1>Bookings</h1>
+          <p class="subtitle">Recent booking requests via the contact form</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <p style="color:var(--grey); font-family:'Cormorant Garamond', serif; font-style:italic; font-size:16px;">
+            Bookings are sent directly to <strong>lundiparkphotography@gmail.com</strong>.<br>
+            View your full booking history at: <a href="https://web3forms.com/dashboard" target="_blank" style="color: var(--pine);">web3forms.com/dashboard</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- Supabase JS Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../src/js/supabase-client.js"></script>
+
+<script>
+// ─────────────────────────────────────────────
+//  ADMIN PANEL LOGIC
+// ─────────────────────────────────────────────
+
+let currentAdmin = null;
+let currentFilter = 'all';
+let allTestimonials = [];
+
+// ─── INIT ───
+window.addEventListener('DOMContentLoaded', async () => {
+  // Check if already logged in
+  const admin = await getCurrentAdmin();
+  if (admin) {
+    currentAdmin = admin;
+    showAdminPanel();
+  } else {
+    document.getElementById('loginView').style.display = 'flex';
+  }
+});
+
+// ─── LOGIN ───
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const errEl = document.getElementById('loginError');
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+  errEl.style.display = 'none';
+
+  const result = await adminSignIn(email, password);
+
+  if (result.success) {
+    currentAdmin = result.admin;
+    showAdminPanel();
+  } else {
+    errEl.textContent = result.error;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+}
+
+async function doLogout() {
+  await adminSignOut();
+  location.reload();
+}
+
+// ─── SHOW PANEL ───
+async function showAdminPanel() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('adminView').style.display = 'grid';
+  document.getElementById('adminName').textContent = currentAdmin.full_name || 'Admin';
+  document.getElementById('adminEmail').textContent = currentAdmin.email;
+
+  await loadDashboard();
+  await loadTestimonials();
+  await loadContent();
+}
+
+// ─── NAVIGATION ───
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const view = btn.dataset.view;
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + view).classList.add('active');
+  });
+});
+
+// ─── DASHBOARD ───
+async function loadDashboard() {
+  const stats = await getAdminStats();
+  document.getElementById('statPending').textContent = stats.pendingTestimonials;
+  document.getElementById('statApproved').textContent = stats.approvedTestimonials;
+  document.getElementById('statPhotos').textContent = stats.totalPhotos || '—';
+  document.getElementById('statBookings').textContent = stats.totalBookings || '—';
+
+  // Update sidebar badge
+  const badge = document.getElementById('pendingBadge');
+  if (stats.pendingTestimonials > 0) {
+    badge.textContent = stats.pendingTestimonials;
+    badge.style.display = 'inline-block';
+  }
+}
+
+// ─── TESTIMONIALS ───
+async function loadTestimonials() {
+  allTestimonials = await fetchAllTestimonials();
+  renderTestimonials();
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderTestimonials();
+  });
+});
+
+function renderTestimonials() {
+  const list = document.getElementById('testimonialsList');
+  let filtered = allTestimonials;
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(t => t.status === currentFilter);
+  }
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty"><p>No testimonials in this category</p></div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(t => `
+    <div class="test-row ${t.status}">
+      <div class="test-meta">
+        <p class="test-name">${escapeHtml(t.name)}</p>
+        <p class="test-info">${t.session_type} · ${t.language.toUpperCase()}</p>
+        <p class="test-rating">${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}</p>
+      </div>
+      <div>
+        <p class="test-content">"${escapeHtml(t.text)}"</p>
+        <p class="test-date">${new Date(t.created_at).toLocaleDateString()} · status: <strong>${t.status}</strong>${t.is_featured ? ' · ⭐ featured' : ''}</p>
+      </div>
+      <div class="test-actions">
+        ${t.status !== 'approved' ? `<button class="btn-approve" onclick="approveTestimonial(${t.id})">Approve</button>` : ''}
+        ${t.status !== 'rejected' ? `<button class="btn-reject" onclick="rejectTestimonial(${t.id})">Reject</button>` : ''}
+        ${t.status === 'approved' ? `<button class="btn-feature ${t.is_featured ? 'active' : ''}" onclick="toggleFeatured(${t.id}, ${!t.is_featured})">${t.is_featured ? 'Unfeature' : 'Feature'}</button>` : ''}
+        <button class="btn-delete" onclick="confirmDelete(${t.id})">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function approveTestimonial(id) {
+  const r = await updateTestimonialStatus(id, { status: 'approved' });
+  if (r.success) {
+    toast('Testimonial approved', 'success');
+    await loadTestimonials();
+    await loadDashboard();
+  } else toast('Error: ' + r.error, 'error');
+}
+
+async function rejectTestimonial(id) {
+  const r = await updateTestimonialStatus(id, { status: 'rejected' });
+  if (r.success) {
+    toast('Testimonial rejected', 'success');
+    await loadTestimonials();
+    await loadDashboard();
+  } else toast('Error: ' + r.error, 'error');
+}
+
+async function toggleFeatured(id, isFeatured) {
+  const r = await updateTestimonialStatus(id, { is_featured: isFeatured });
+  if (r.success) {
+    toast(isFeatured ? 'Featured!' : 'Unfeatured', 'success');
+    await loadTestimonials();
+  } else toast('Error: ' + r.error, 'error');
+}
+
+async function confirmDelete(id) {
+  if (!confirm('Permanently delete this testimonial?')) return;
+  const r = await deleteTestimonial(id);
+  if (r.success) {
+    toast('Deleted', 'success');
+    await loadTestimonials();
+    await loadDashboard();
+  } else toast('Error: ' + r.error, 'error');
+}
+
+// ─── CONTENT EDITOR ───
+async function loadContent() {
+  const content = await fetchSiteContent();
+  const list = document.getElementById('contentList');
+
+  // Convert map to array with key
+  const arr = Object.entries(content).map(([key, val]) => ({ key, ...val }));
+
+  if (arr.length === 0) {
+    list.innerHTML = '<div class="empty"><p>No content yet. The site content table is empty in Supabase.</p></div>';
+    return;
+  }
+
+  list.innerHTML = arr.map(c => `
+    <div class="content-row" data-key="${c.key}">
+      <div class="key">${c.key}</div>
+      <div class="langs">
+        <div class="lang-block">
+          <label>English ${c.is_html ? '(HTML allowed)' : ''}</label>
+          <textarea data-lang="en" rows="2">${escapeHtml(c.en)}</textarea>
+        </div>
+        <div class="lang-block">
+          <label>Français ${c.is_html ? '(HTML allowed)' : ''}</label>
+          <textarea data-lang="fr" rows="2">${escapeHtml(c.fr)}</textarea>
+        </div>
+      </div>
+      <button class="save-btn" onclick="saveContent('${c.key}', this)">Save Changes</button>
+    </div>
+  `).join('');
+}
+
+async function saveContent(key, btn) {
+  const row = btn.closest('.content-row');
+  const en = row.querySelector('[data-lang="en"]').value;
+  const fr = row.querySelector('[data-lang="fr"]').value;
+
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const r = await updateContent(key, en, fr);
+
+  if (r.success) {
+    btn.classList.add('saved');
+    btn.textContent = 'Saved ✓';
+    toast('Content saved', 'success');
+    setTimeout(() => {
+      btn.classList.remove('saved');
+      btn.textContent = 'Save Changes';
+      btn.disabled = false;
+    }, 2000);
+  } else {
+    btn.textContent = 'Error — retry';
+    toast('Error: ' + r.error, 'error');
+    setTimeout(() => { btn.textContent = 'Save Changes'; btn.disabled = false; }, 3000);
+  }
+}
+
+// ─── HELPERS ───
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function toast(message, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = message;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
