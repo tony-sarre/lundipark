@@ -10,7 +10,7 @@ const SUPABASE_URL = 'https://xqrskvbhvxwrsdzufgtn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxcnNrdmJodnh3cnNkenVmZ3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzQ4ODUsImV4cCI6MjA5NDQ1MDg4NX0.XdOh6j974LwIGpEaBNPoBrgQO77em56G8udHbRNXW4o';
 
 // Initialize Supabase client (loaded via CDN in HTML)
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ────────────────────────────────────────────────────────────────
 //  PUBLIC API — Used by the visitor-facing site
@@ -21,7 +21,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
  * Filtered by language if specified
  */
 async function fetchApprovedTestimonials(language = null) {
-  let query = supabase
+  let query = sb
     .from('testimonials')
     .select('*')
     .eq('status', 'approved')
@@ -59,7 +59,7 @@ async function submitTestimonial(testimonial) {
     return { success: false, error: 'Testimonial too long (max 1000 chars)' };
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('testimonials')
     .insert([{
       name: name.trim(),
@@ -78,7 +78,7 @@ async function submitTestimonial(testimonial) {
   }
 
   // Log event for stats
-  await supabase.from('site_events').insert([{
+  await sb.from('site_events').insert([{
     event_type: 'testimonial_submit',
     metadata: { session_type, rating, language }
   }]);
@@ -91,7 +91,7 @@ async function submitTestimonial(testimonial) {
  * Returns map: { key: { en, fr, is_html } }
  */
 async function fetchSiteContent() {
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('site_content')
     .select('key, value_en, value_fr, is_html');
 
@@ -115,7 +115,7 @@ async function fetchSiteContent() {
  * Fetch all active photos, grouped by section
  */
 async function fetchPhotos() {
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('photos')
     .select('*')
     .eq('is_active', true)
@@ -144,18 +144,18 @@ async function fetchPhotos() {
  * Sign in with email + password
  */
 async function adminSignIn(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) return { success: false, error: error.message };
 
   // Verify user is in admin_users table
-  const { data: adminRow, error: adminError } = await supabase
+  const { data: adminRow, error: adminError } = await sb
     .from('admin_users')
     .select('*')
     .eq('id', data.user.id)
     .single();
 
   if (adminError || !adminRow) {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     return { success: false, error: 'You are not an admin' };
   }
 
@@ -163,14 +163,14 @@ async function adminSignIn(email, password) {
 }
 
 async function adminSignOut() {
-  return await supabase.auth.signOut();
+  return await sb.auth.signOut();
 }
 
 async function getCurrentAdmin() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return null;
 
-  const { data: admin } = await supabase
+  const { data: admin } = await sb
     .from('admin_users')
     .select('*')
     .eq('id', user.id)
@@ -183,7 +183,7 @@ async function getCurrentAdmin() {
  * Admin: fetch ALL testimonials (any status)
  */
 async function fetchAllTestimonials() {
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('testimonials')
     .select('*')
     .order('created_at', { ascending: false });
@@ -196,14 +196,14 @@ async function fetchAllTestimonials() {
  * Admin: approve / reject / feature a testimonial
  */
 async function updateTestimonialStatus(id, updates) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
   const payload = { ...updates };
   if (updates.status === 'approved') {
     payload.approved_at = new Date().toISOString();
     payload.approved_by = user?.id;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('testimonials')
     .update(payload)
     .eq('id', id)
@@ -213,7 +213,7 @@ async function updateTestimonialStatus(id, updates) {
 }
 
 async function deleteTestimonial(id) {
-  const { error } = await supabase.from('testimonials').delete().eq('id', id);
+  const { error } = await sb.from('testimonials').delete().eq('id', id);
   return { success: !error, error: error?.message };
 }
 
@@ -221,8 +221,8 @@ async function deleteTestimonial(id) {
  * Admin: update a site content row
  */
 async function updateContent(key, value_en, value_fr) {
-  const { data: { user } } = await supabase.auth.getUser();
-  const { data, error } = await supabase
+  const { data: { user } } = await sb.auth.getUser();
+  const { data, error } = await sb
     .from('site_content')
     .update({ value_en, value_fr, updated_by: user?.id })
     .eq('key', key)
@@ -235,22 +235,22 @@ async function updateContent(key, value_en, value_fr) {
  * Admin: upload a photo to Supabase Storage and register it
  */
 async function uploadPhoto(file, section, position, altEn = '', altFr = '') {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
   const fileName = `${section}-${position}-${Date.now()}.${file.name.split('.').pop()}`;
   const filePath = `${section}/${fileName}`;
 
   // Upload to Storage
-  const { data: uploadData, error: uploadError } = await supabase
+  const { data: uploadData, error: uploadError } = await sb
     .storage.from('photos')
     .upload(filePath, file, { cacheControl: '3600', upsert: false });
 
   if (uploadError) return { success: false, error: uploadError.message };
 
   // Get public URL
-  const { data: urlData } = supabase.storage.from('photos').getPublicUrl(filePath);
+  const { data: urlData } = sb.storage.from('photos').getPublicUrl(filePath);
 
   // Insert into photos table
-  const { data: photoData, error: dbError } = await supabase
+  const { data: photoData, error: dbError } = await sb
     .from('photos')
     .insert([{
       storage_path: filePath,
@@ -269,8 +269,8 @@ async function uploadPhoto(file, section, position, altEn = '', altFr = '') {
 }
 
 async function deletePhoto(id, storagePath) {
-  await supabase.storage.from('photos').remove([storagePath]);
-  const { error } = await supabase.from('photos').delete().eq('id', id);
+  await sb.storage.from('photos').remove([storagePath]);
+  const { error } = await sb.from('photos').delete().eq('id', id);
   return { success: !error, error: error?.message };
 }
 
@@ -284,10 +284,10 @@ async function getAdminStats() {
     { count: totalPhotos },
     { count: totalBookings }
   ] = await Promise.all([
-    supabase.from('testimonials').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('testimonials').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
-    supabase.from('photos').select('*', { count: 'exact', head: true }).eq('is_active', true),
-    supabase.from('site_events').select('*', { count: 'exact', head: true }).eq('event_type', 'booking')
+    sb.from('testimonials').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    sb.from('testimonials').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+    sb.from('photos').select('*', { count: 'exact', head: true }).eq('is_active', true),
+    sb.from('site_events').select('*', { count: 'exact', head: true }).eq('event_type', 'booking')
   ]);
 
   return {
